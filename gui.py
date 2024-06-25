@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from pytube import Playlist
-from pytube import Youtube
+from pytube import YouTube
 import threading
 
 class YouTubePlaylistDownloader:
@@ -30,14 +30,10 @@ class YouTubePlaylistDownloader:
         self.browse_button = tk.Button(root, text="Browse", command=self.browse)
         self.browse_button.grid(row=2, column=2, padx=10, pady=10)
         
-        self.download_button = tk.Button(root, text="Download Playlist", command=self.download_playlist)
+        self.download_button = tk.Button(root, text="Download", command=self.download_playlist)
         self.download_button.grid(row=3, column=1, padx=10, pady=10)
         
-        self.status_label = tk.Label(root, text="", fg="blue")
-        self.status_label.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
-
-        self.download_button = tk.Button(root, text="Download Video", command=self.download_playlist)
-        self.download_button.grid(row=3, column=1, padx=10, pady=10)
+        
         
         self.status_label = tk.Label(root, text="", fg="blue")
         self.status_label.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
@@ -47,10 +43,6 @@ class YouTubePlaylistDownloader:
         if download_path:
             self.download_path_entry.delete(0, tk.END)
             self.download_path_entry.insert(0, download_path)
-    
-    def video_only(self,video_url,download_path):
-        video = Youtube(video_url)
-        video.streams.get_highest_resolution().download(output_path=download_path)
 
 
     def download_playlist(self):
@@ -59,24 +51,35 @@ class YouTubePlaylistDownloader:
         video_url = self.video_url_entry.get()
 
 
-        if vidownload_path:
+        if (video_url or playlist_url) and download_path:
             if video_url and not playlist_url:
-                self.status_label.config(text="Downloading...")
+                # self.status_label.config(text="Downloading...")
                 threading.Thread(target=self.video_only, args=(video_url,download_path)).start()
                 return
             
             if not video_url and playlist_url:
-                self.status_label.config(text="Downloading...")
+                # self.status_label.config(text="Downloading...")
                 threading.Thread(target=self.download_videos, args=(playlist_url, download_path)).start()
                 return
             
-            if not playlist_url or or not download_path:
-                messagebox.showerror("Error", "Please enter both URL and download path.")
+        else:
+            messagebox.showerror("Error", "Please enter download path.")
             return
         
         
-        
-        
+    def video_only(self,video_url,download_path):
+        try:
+            video = YouTube(video_url)
+            self.status_label.config(text=f"Downloading: {video.title}")
+            video.streams.get_highest_resolution().download(output_path=download_path) 
+            self.status_label.config(text="Download completed.")
+            messagebox.showinfo("Success", "video have been downloaded.")
+            
+            
+        except Exception as e:
+            self.status_label.config(text="")
+            messagebox.showerror("Error", f"An error occurred: {e}")
+    
     
     def download_videos(self, playlist_url, download_path):
         try:
