@@ -7,7 +7,7 @@
 5. range of video in playlist
 6. hit `download` multiple times
 7. message box for exception (paal kudi da)
-
+8. Delpoy !
 
 self.status_label = tk.Label(root, text="", fg="blue")
         self.status_label.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
